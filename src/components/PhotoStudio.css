@@ -1,0 +1,340 @@
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700&family=Poppins:wght@300;500;600&display=swap");
+
+body {
+  background: radial-gradient(circle at center, #0f0f1a, #000000);
+  color: #fff;
+  font-family: "Poppins", sans-serif;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+/* Global button styles for consistency */
+button {
+  font-family: "Poppins", sans-serif;
+  outline: none;
+}
+
+button:focus {
+  outline: 2px solid rgba(0, 234, 255, 0.6);
+  outline-offset: 2px;
+}
+
+/* Layout */
+.studio-wrapper {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.studio-body {
+  display: flex;
+  gap: 60px;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(20px);
+  padding: 40px 60px;
+  border-radius: 25px;
+  border: 2px solid rgba(0, 234, 255, 0.3);
+  box-shadow: 0 0 40px rgba(0, 234, 255, 0.2);
+}
+
+/* Left Panel */
+.left-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.webcam-box {
+  width: 420px;
+  height: 320px;
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  border: 2px solid rgba(0, 234, 255, 0.4);
+  box-shadow: 0 0 30px rgba(0, 234, 255, 0.3);
+  margin-bottom: 20px;
+  background: rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.webcam-box:hover {
+  box-shadow: 0 0 40px rgba(0, 234, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+.webcam-feed {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 20px;
+}
+
+/* Countdown */
+.countdown {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 4rem;
+  color: #00eaff;
+  text-shadow: 0 0 25px #00eaff;
+  font-family: "Orbitron", sans-serif;
+  font-weight: 700;
+  z-index: 10;
+}
+
+/* Filter Buttons */
+.filter-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.filter-option {
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 2px solid rgba(0, 234, 255, 0.4);
+  background: rgba(0, 0, 0, 0.6);
+  color: #00eaff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.filter-option.active,
+.filter-option:hover {
+  background: linear-gradient(135deg, #00eaff, #00aaff);
+  color: #000814;
+  box-shadow: 0 0 20px rgba(0, 234, 255, 0.8);
+  transform: translateY(-2px);
+}
+
+/* Filter-specific styles */
+.webcam-box._90s {
+  filter: contrast(1.1) sepia(0.3) hue-rotate(-10deg) saturate(0.8)
+    brightness(1.1);
+}
+
+.webcam-box._2000s {
+  filter: saturate(1.8) contrast(1.05) brightness(1.1) sepia(0.1)
+    hue-rotate(10deg);
+}
+
+.webcam-box.noir {
+  filter: grayscale(1) contrast(0.8) brightness(1.1);
+}
+
+.webcam-box.rainbow {
+  filter: hue-rotate(90deg);
+}
+
+.webcam-box.glitch {
+  filter: contrast(1.5) saturate(2);
+}
+
+.webcam-box.crosshatch {
+  filter: grayscale(0.5) blur(1px);
+}
+
+.webcam-box.fisheye {
+  filter: brightness(1.1);
+}
+
+/* Right Panel */
+.right-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: left;
+  width: 300px;
+}
+
+.studio-header {
+  margin-bottom: 20px;
+}
+
+.back-btn {
+  background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+  color: white;
+  border: 2px solid rgba(255, 107, 107, 0.4);
+  border-radius: 12px;
+  padding: 10px 18px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 0 15px rgba(255, 107, 107, 0.3);
+}
+
+.back-btn:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 0 25px rgba(255, 107, 107, 0.6);
+  background: linear-gradient(45deg, #ff5555, #ff7777);
+}
+
+.back-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.result-back-btn {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 10;
+}
+
+.studio-title {
+  font-family: "Orbitron", sans-serif;
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+  color: #00eaff;
+  text-shadow: 0 0 15px rgba(0, 234, 255, 0.5);
+  letter-spacing: 2px;
+}
+
+.studio-sub {
+  font-size: 1rem;
+  margin-bottom: 20px;
+  opacity: 0.8;
+  color: #00ffc8;
+}
+
+.capture-btn-modern {
+  background: linear-gradient(45deg, #00eaff, #00aaff);
+  color: #000814;
+  font-weight: 700;
+  border: 2px solid rgba(0, 234, 255, 0.6);
+  border-radius: 15px;
+  padding: 16px 28px;
+  cursor: pointer;
+  box-shadow: 0 0 25px rgba(0, 234, 255, 0.5);
+  transition: all 0.3s ease;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.capture-btn-modern:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 0 35px rgba(0, 234, 255, 0.8);
+  background: linear-gradient(45deg, #00ffff, #0099ff);
+}
+
+.capture-btn-modern:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Result Screen */
+.result-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+  animation: fadeIn 0.6s ease;
+  position: relative;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.result-frame {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.95),
+    rgba(240, 240, 240, 0.95)
+  );
+  padding: 25px;
+  border-radius: 25px;
+  border: 3px solid rgba(0, 234, 255, 0.4);
+  box-shadow: 0 0 40px rgba(0, 234, 255, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+.result-photo {
+  width: 220px;
+  border-radius: 15px;
+  display: block;
+  margin: 12px 0;
+  border: 2px solid rgba(0, 234, 255, 0.3);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease;
+}
+
+.result-photo:hover {
+  transform: scale(1.02);
+}
+
+.result-caption {
+  color: #333;
+  font-weight: 600;
+  text-align: center;
+  font-size: 14px;
+  font-family: "Orbitron", sans-serif;
+  letter-spacing: 1px;
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Buttons */
+.result-actions {
+  display: flex;
+  gap: 20px;
+}
+
+.reshoot-btn,
+.download-btn {
+  padding: 12px 24px;
+  border-radius: 15px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+}
+
+.reshoot-btn {
+  background: linear-gradient(45deg, #ff0055, #ff3366);
+  color: white;
+  border-color: rgba(255, 0, 85, 0.4);
+  box-shadow: 0 0 20px rgba(255, 0, 85, 0.3);
+}
+
+.download-btn {
+  background: linear-gradient(45deg, #00eaff, #00aaff);
+  color: #000814;
+  border-color: rgba(0, 234, 255, 0.4);
+  box-shadow: 0 0 20px rgba(0, 234, 255, 0.3);
+}
+
+.reshoot-btn:hover,
+.download-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 30px rgba(0, 234, 255, 0.6);
+}
+
+.reshoot-btn:hover {
+  box-shadow: 0 0 30px rgba(255, 0, 85, 0.6);
+}
