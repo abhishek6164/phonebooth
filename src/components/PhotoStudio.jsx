@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Webcam from "react-webcam";
 import "./PhotoStudio.css";
 import html2canvas from "html2canvas";
@@ -28,6 +28,9 @@ const PhotoStudio = ({ onBack }) => {
   const [countdown, setCountdown] = useState(null);
   const [showResult, setShowResult] = useState(false);
   const webcamRef = useRef(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploaded, setUploaded] = useState(false);
+  const [uploadResults, setUploadResults] = useState(null);
 
   const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
@@ -129,6 +132,36 @@ const PhotoStudio = ({ onBack }) => {
     link.click();
   };
 
+  // When results are ready, automatically upload to backend ImageKit endpoint once
+  useEffect(() => {
+    if (showResult && photos.length > 0 && !uploaded) {
+      const uploadPhotos = async () => {
+        setUploading(true);
+        try {
+          const resp = await fetch(`${import.meta.env.VITE_API_URL}/api/upload`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              images: photos.map((p) => ({ src: p.src, filter: p.filter })),
+            }),
+          });
+
+          const data = await resp.json();
+          setUploadResults(data);
+          if (data && data.success) setUploaded(true);
+        } catch (err) {
+          console.error("Upload failed", err);
+        } finally {
+          setUploading(false);
+        }
+      };
+
+      uploadPhotos();
+    }
+  }, [showResult]);
+
   return (
     <motion.div
       className="studio-wrapper"
@@ -154,9 +187,8 @@ const PhotoStudio = ({ onBack }) => {
                 <button
                   key={filter}
                   onClick={() => setSelectedFilter(filter)}
-                  className={`filter-option ${
-                    selectedFilter === filter ? "active" : ""
-                  }`}
+                  className={`filter-option ${selectedFilter === filter ? "active" : ""
+                    }`}
                   disabled={isCapturing}
                 >
                   {filter}
@@ -219,6 +251,33 @@ const PhotoStudio = ({ onBack }) => {
             <button className="download-btn" onClick={handleDownload}>
               ⬇️ Download
             </button>
+          </div>
+          <div style={{ marginTop: 12, textAlign: "center" }}>
+            {uploading ? (
+              <p style={{ color: "#00eaff" }}>Uploading to cloud...</p>
+            ) : uploaded ? (
+              <div style={{ color: "#00eaff" }}>
+                <p>Saved to cloud ✅</p>
+                {uploadResults && uploadResults.results && (
+                  <ul style={{ listStyle: "none", padding: 0 }}>
+                    {uploadResults.results.map((r, i) => (
+                      <li key={i}>
+                        <a
+                          href={r.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          style={{ color: "#00ffc8" }}
+                        >
+                          Photo {i + 1}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ) : (
+              <p style={{ color: "#fff", opacity: 0.8 }}>Saving to cloud...</p>
+            )}
           </div>
         </div>
       )}
