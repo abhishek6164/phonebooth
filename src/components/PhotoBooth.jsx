@@ -26,6 +26,7 @@ const PhotoBooth = () => {
     setIsTransitioning(true);
     setCurtainOpen(true);
 
+    // Add sound effect simulation (visual feedback)
     setTimeout(() => {
       setShowStudio(true);
       setIsTransitioning(false);

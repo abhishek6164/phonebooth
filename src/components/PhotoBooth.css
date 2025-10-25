@@ -39,10 +39,12 @@
 }
 
 @keyframes iconPulse {
+
   0%,
   100% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.1);
   }
@@ -102,20 +104,20 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(
-    45deg,
-    transparent,
-    rgba(0, 255, 200, 0.1),
-    transparent
-  );
+  background: linear-gradient(45deg,
+      transparent,
+      rgba(0, 255, 200, 0.1),
+      transparent);
   animation: slotShimmer 3s ease-in-out infinite;
 }
 
 @keyframes slotShimmer {
+
   0%,
   100% {
     transform: translateX(-100%);
   }
+
   50% {
     transform: translateX(100%);
   }
@@ -144,10 +146,12 @@
 }
 
 @keyframes indicatorBlink {
+
   0%,
   100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.3;
   }
@@ -181,10 +185,12 @@
 }
 
 @keyframes iconBounce {
+
   0%,
   100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-5px);
   }
@@ -211,10 +217,12 @@
 }
 
 @keyframes arrowBounce {
+
   0%,
   100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(3px);
   }
@@ -270,16 +278,19 @@
 }
 
 @keyframes textGlow {
+
   0%,
   100% {
     text-shadow: 0 0 5px #00ffc8;
   }
+
   50% {
     text-shadow: 0 0 15px #00ffc8;
   }
 }
 
 @keyframes coinPulse {
+
   0%,
   100% {
     transform: scale(1);
@@ -411,6 +422,7 @@
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
@@ -445,13 +457,11 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: repeating-linear-gradient(
-    45deg,
-    transparent,
-    transparent 10px,
-    rgba(255, 255, 255, 0.1) 10px,
-    rgba(255, 255, 255, 0.1) 20px
-  );
+  background: repeating-linear-gradient(45deg,
+      transparent,
+      transparent 10px,
+      rgba(255, 255, 255, 0.1) 10px,
+      rgba(255, 255, 255, 0.1) 20px);
   animation: patternMove 3s linear infinite;
 }
 
@@ -459,6 +469,7 @@
   0% {
     transform: translateX(-20px);
   }
+
   100% {
     transform: translateX(20px);
   }
@@ -520,10 +531,12 @@
 }
 
 @keyframes statusPulse {
+
   0%,
   100% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.2);
   }
@@ -544,10 +557,130 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(
-    circle at center,
-    rgba(0, 255, 255, 0.05),
-    transparent 70%
-  );
+  background: radial-gradient(circle at center,
+      rgba(0, 255, 255, 0.05),
+      transparent 70%);
   z-index: 0;
+}
+
+/* Responsive: tablet and mobile adjustments */
+@media (max-width: 900px) {
+  body {
+    /* allow scrolling on smaller viewports (container previously used full-viewport height) */
+    overflow: auto;
+  }
+
+  .booth-container {
+    height: auto;
+    padding: 20px 0;
+  }
+
+  .header-content {
+    padding: 12px 18px;
+    gap: 12px;
+    width: calc(100% - 36px);
+    box-sizing: border-box;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .header-icon {
+    font-size: 2.2rem;
+  }
+
+  .header-text h1 {
+    font-size: 1.6rem;
+    text-align: center;
+  }
+
+  .booth-body {
+    flex-direction: column;
+    width: calc(100% - 32px);
+    max-width: 920px;
+    height: auto;
+    gap: 12px;
+    box-sizing: border-box;
+  }
+
+  .coin-slot {
+    width: 100%;
+    max-width: 260px;
+    border-right: none;
+    border-bottom: 2px solid rgba(0, 255, 200, 0.18);
+    border-radius: 15px;
+    padding: 12px;
+  }
+
+  .curtain-wrapper {
+    border-left: none;
+    border-top: 2px solid rgba(0, 234, 255, 0.4);
+  }
+
+  .webcam-preview {
+    border-radius: 0 15px 15px 0;
+    position: relative;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+
+  .status-indicator span {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    overflow: auto;
+    font-size: 14px;
+  }
+
+  .header-content {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+
+  .header-icon {
+    font-size: 1.8rem;
+  }
+
+  .header-text h1 {
+    font-size: 1.2rem;
+    letter-spacing: 1.5px;
+  }
+
+  .booth-body {
+    width: calc(100% - 20px);
+    padding: 10px;
+    border-radius: 12px;
+  }
+
+  .coin-slot {
+    max-width: none;
+    width: 100%;
+    padding: 10px;
+    font-size: 12px;
+  }
+
+  .coin {
+    width: 40px;
+    height: 40px;
+  }
+
+  .insert-icon {
+    font-size: 1.6rem;
+  }
+
+  .overlay-text {
+    font-size: 9px;
+  }
+
+  .loading-spinner {
+    width: 30px;
+    height: 30px;
+  }
+
+  .curtain {
+    opacity: 0.96;
+  }
 }
