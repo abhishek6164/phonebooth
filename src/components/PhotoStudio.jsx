@@ -19,7 +19,7 @@ const PhotoStudio = ({ onBack }) => {
   const handleBack =
     onBack ||
     (() => {
-      // This will be handled by the parent component
+      // This will be handled by the parent component, fallback to reload
       window.location.reload();
     });
   const [selectedFilter, setSelectedFilter] = useState("90s");
@@ -30,7 +30,9 @@ const PhotoStudio = ({ onBack }) => {
   const webcamRef = useRef(null);
   const [uploading, setUploading] = useState(false);
   const [uploaded, setUploaded] = useState(false);
+  const [uploadError, setUploadError] = useState(null); // New state for error
   const [uploadResults, setUploadResults] = useState(null);
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
   const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
@@ -101,6 +103,8 @@ const PhotoStudio = ({ onBack }) => {
     setIsCapturing(true);
     setPhotos([]);
     setShowResult(false);
+    setUploaded(false);
+    setUploadError(null); // Reset error
 
     for (let i = 0; i < 3; i++) {
       await countdownStep("3");
@@ -119,6 +123,9 @@ const PhotoStudio = ({ onBack }) => {
   const handleReshoot = () => {
     setPhotos([]);
     setShowResult(false);
+    setUploaded(false);
+    setUploadError(null);
+    setUploadResults(null);
   };
 
   const handleDownload = async () => {
@@ -132,27 +139,84 @@ const PhotoStudio = ({ onBack }) => {
     link.click();
   };
 
-  // When results are ready, automatically upload to backend ImageKit endpoint once
+  // Resizing utility (kept as is)
+  const resizeDataUrl = (dataUrl, maxWidth = 1200, quality = 0.8) =>
+    new Promise((resolve, reject) => {
+      const img = new window.Image();
+      img.onload = () => {
+        const ratio = img.width / img.height || 1;
+        let width = img.width;
+        let height = img.height;
+        if (width > maxWidth) {
+          width = maxWidth;
+          height = Math.round(width / ratio);
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+        try {
+          const resized = canvas.toDataURL("image/jpeg", quality);
+          resolve(resized);
+        } catch (err) {
+          console.warn('Resize toDataURL failed', err);
+          resolve(dataUrl);
+        }
+      };
+      img.onerror = (e) => reject(e);
+      img.src = dataUrl;
+    });
+
+  // Upload effect (updated for better error handling)
   useEffect(() => {
-    if (showResult && photos.length > 0 && !uploaded) {
+    if (showResult && photos.length > 0 && !uploaded && !uploading && !uploadError) {
       const uploadPhotos = async () => {
         setUploading(true);
+        setUploadError(null);
         try {
-          const resp = await fetch(`${import.meta.env.VITE_API_URL}/api/upload`, {
+          const resized = await Promise.all(
+            photos.map((p) => resizeDataUrl(p.src, 1200, 0.8).then((s) => ({ src: s, filter: p.filter })))
+          );
+
+          const resp = await fetch(`${API_URL}/api/upload`, {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              images: photos.map((p) => ({ src: p.src, filter: p.filter })),
-            }),
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ images: resized }),
           });
 
-          const data = await resp.json();
+          // --- CRITICAL FIX: Handle potential non-JSON or empty response ---
+          const text = await resp.text();
+          let data = null;
+
+          try {
+            // This handles the 'Unexpected end of JSON input' by checking the response text.
+            // If the server failed and sent an empty body, 'text' will be empty.
+            data = text ? JSON.parse(text) : null;
+          } catch (err) {
+            // This indicates a parsing error, likely if the server returned non-JSON text (e.g., HTML error page).
+            console.error("Upload returned non-JSON response:", err, text.substring(0, 200) + '...');
+            throw new Error(`Invalid response from server (Status: ${resp.status}). Raw body: ${text.substring(0, 50)}...`);
+          }
+          // --- END CRITICAL FIX ---
+
+
           setUploadResults(data);
-          if (data && data.success) setUploaded(true);
+
+          if (resp.ok && data && data.success) {
+            setUploaded(true);
+          } else if (!resp.ok && data && data.error) {
+            // Server returned an error, but in valid JSON (e.g., 400 or 500 with a body)
+            throw new Error(data.error);
+          } else {
+            // Handle server error with no descriptive JSON body or resp.ok is false
+            throw new Error(`Upload failed with status ${resp.status}.`);
+          }
+
         } catch (err) {
-          console.error("Upload failed", err);
+          console.error("Upload failed in client logic:", err);
+          setUploadError(err.message || "Failed to connect to server or upload.");
+          setUploaded(false);
         } finally {
           setUploading(false);
         }
@@ -160,7 +224,7 @@ const PhotoStudio = ({ onBack }) => {
 
       uploadPhotos();
     }
-  }, [showResult]);
+  }, [showResult, photos, uploaded, uploading, uploadError, API_URL]);
 
   return (
     <motion.div
@@ -170,6 +234,7 @@ const PhotoStudio = ({ onBack }) => {
       transition={{ duration: 0.8 }}
     >
       {!showResult ? (
+        // ... (Capturing UI remains the same)
         <div className="studio-body">
           <div className="left-panel">
             <div className={`webcam-box ${getFilterClass(selectedFilter)}`}>
@@ -221,6 +286,7 @@ const PhotoStudio = ({ onBack }) => {
           </div>
         </div>
       ) : (
+        // Result UI (updated to show upload error)
         <div className="result-screen">
           <button className="back-btn result-back-btn" onClick={handleBack}>
             ← Back to Booth
@@ -255,20 +321,25 @@ const PhotoStudio = ({ onBack }) => {
           <div style={{ marginTop: 12, textAlign: "center" }}>
             {uploading ? (
               <p style={{ color: "#00eaff" }}>Uploading to cloud...</p>
+            ) : uploadError ? (
+              <div style={{ color: '#ff6961', padding: '10px', border: '1px solid #ff6961', borderRadius: '4px' }}>
+                <p>Upload failed ❌</p>
+                <p style={{ fontSize: '0.8em', margin: 0 }}>**Error:** {uploadError}</p>
+              </div>
             ) : uploaded ? (
               <div style={{ color: "#00eaff" }}>
                 <p>Saved to cloud ✅</p>
                 {uploadResults && uploadResults.results && (
                   <ul style={{ listStyle: "none", padding: 0 }}>
                     {uploadResults.results.map((r, i) => (
-                      <li key={i}>
+                      <li key={i} style={{ opacity: r.uploaded ? 1 : 0.5 }}>
                         <a
                           href={r.url}
                           target="_blank"
                           rel="noreferrer"
-                          style={{ color: "#00ffc8" }}
+                          style={{ color: r.uploaded ? "#00ffc8" : "#ff6961" }}
                         >
-                          Photo {i + 1}
+                          Photo {i + 1} {r.uploaded ? '' : '(Failed)'}
                         </a>
                       </li>
                     ))}

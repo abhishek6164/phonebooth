@@ -210,12 +210,12 @@ const PhotoBooth = () => {
             {cameraError
               ? "Camera Error - Check Permissions"
               : cameraLoading
-              ? "Initializing Camera..."
-              : isTransitioning
-              ? "Starting Photo Session..."
-              : coinInserted
-              ? "Ready to Start"
-              : "Insert Coin to Begin"}
+                ? "Initializing Camera..."
+                : isTransitioning
+                  ? "Starting Photo Session..."
+                  : coinInserted
+                    ? "Ready to Start"
+                    : "Insert Coin to Begin"}
           </span>
         </div>
       </div>
