@@ -32,7 +32,8 @@ const PhotoStudio = ({ onBack }) => {
   const [uploaded, setUploaded] = useState(false);
   const [uploadError, setUploadError] = useState(null); // New state for error
   const [uploadResults, setUploadResults] = useState(null);
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const API_URL = import.meta.env.VITE_API_URL;
+  console.log("🌐 Using API:", API_URL);
 
   const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
